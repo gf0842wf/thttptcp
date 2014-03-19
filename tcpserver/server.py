@@ -7,15 +7,16 @@ from functools import partial
 from share import fd2sock, sock2queue, ioloop
 import socket, Queue
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 def init_socket(addr):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setblocking(0)
     sock.bind(addr)
     sock.listen(200)
     fd = sock.fileno()
     fd2sock[fd] = sock
-    return fd
+    return (fd, sock)
 
 def handle_client(fd, event, cli_addr):
     s = fd2sock[fd]
@@ -58,10 +59,15 @@ def handle_server(fd, event):
         ioloop.add_handler(conn_fd, handle, IOLoop.READ)
         sock2queue[conn] = Queue.Queue()   # 创建对应的消息队列
 
+fd = None
+sock = None
+
 def add_handler(port, event=IOLoop.READ):
-    fd = init_socket(("0.0.0.0", port))
+    global fd
+    global sock
+    fd, sock = init_socket(("0.0.0.0", port))
     handle = partial(handle_server)
     ioloop.add_handler(fd, handle, event)
     
-__all__ = ["add_handler"]
+__all__ = ["add_handler", "fd", "sock"]
         

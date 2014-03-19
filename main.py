@@ -26,4 +26,4 @@ if __name__ == "__main__":
     logging.debug("tcp server:%s", options.tcpport)
     # IO 循环
     ioloop.start()
-    # python server.py --httpport=8880 --tcpport=8881 --logging=warning  # 这里的会覆盖 *1行的
+    # python main.py --httpport=8880 --tcpport=8881 --logging=warning  # 这里的会覆盖 *1行的
